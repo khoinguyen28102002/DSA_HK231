@@ -1,4 +1,5 @@
 #include<iostream>
+#include<assert.h>
 
 using namespace std;
 
@@ -19,161 +20,220 @@ public:
         delete [] tail;
         count = 0;
     }
-    // void add(const T &e);
-    void add(int index, const T &e){
-        Node *temp = new Node(e);
-        if(index == 0 || this->head == NULL){
-            if(head == NULL){
-                head = temp;
-            }else{
-                temp->next = head;
-                head = temp;
-            }
-        }else{
-            int k = 1;
-            Node *p = this->head;
-            while(p != NULL && k != index){
-                p = p->next;
-                k++;
-            }
-            if(k!= index){
-                this->tail->next = temp;
-                this->tail = temp;
-            }else{
-                temp->next = p->next;
-                p->next = temp;
-            }
-        }
-        count++;
-    }
-    T removeAt(int index){
-        T data;
-        if(index == 0 ||  head->next == NULL){
-            data = head->data;
-            head = head->next;
-        }else{
-            int k = 1;
-            Node *p = this->head;
-            while(p->next->next != NULL && k != index){
-                p = p->next;
-                k++;
-            }
-            if(p->next != NULL) {
-                data = p->data;
-            }
-            p->next = p->next->next;
-        }
-        count--;
-        return data;
-    };
-    // bool removeItem(const T &removeItem);
-    // bool empty();
-    int size(){
-        return this->count;
-    };
-    void clear(){
-        delete [] head;
-        delete [] tail;
-        count = 0;
-    }
-    T get(int index){
-        int k = 0;
-        Node *p = this->head;
-        while(p != NULL && k != index){
-            p = p->next;
-            k++;
-        }
-        if(p){
-            return p->data;
-        }
-        return -1;
-    }
-    void set(int index, const T &e){
-        int k = 0;
-        Node *p = this->head;
-        while(p != NULL && k != index){
-            p = p->next;
-            k++;
-        }
-        if(p){
-            p->data = e;
-        }
-    }
-    // int indexOf(const T &item);
-    // bool contains(const T &item);
-    // string toString();
-    SLinkedList(const SLinkedList &list)
-    {
+    void add(const T &e);
+    void add(int index, const T &e);
+    T removeAt(int index);
+    bool removeItem(const T &removeItem);
+    bool empty();
+    int size();
+    void clear();
+    T get(int index);
+    void set(int index, const T &e);
+    int indexOf(const T &item);
+    bool contains(const T &item);
+    SLinkedList(const SLinkedList &list){
         this->count = 0;
         this->head = NULL;
         this->tail = NULL;
     }
-    Iterator begin()
-    {
+    Iterator begin(){
         return Iterator(this, true);
     }
-    Iterator end()
-    {
+    Iterator end(){
         return Iterator(this, false);
     }
 public:
-    class Node
-    {
-    private:
-        T data;
-        Node *next;
-        friend class SLinkedList<T>;
-    public:
-        Node()
-        {
-            next = 0;
-        }
-        Node(Node *next)
-        {
-            this->next = next;
-        }
-        Node(T data, Node *next = NULL)
-        {
-            this->data = data;
-            this->next = next;
-        }
+    class Node{
+        private:
+            T data;
+            Node *next;
+            friend class SLinkedList<T>;
+        public:
+            Node()
+            {
+                next = 0;
+            }
+            Node(Node *next)
+            {
+                this->next = next;
+            }
+            Node(T data, Node *next = NULL)
+            {
+                this->data = data;
+                this->next = next;
+            }
     };
-    class Iterator
-    {
-    private:
-        SLinkedList<T> *pList;
-        Node *current;
-        int index; // corresponding with current node
-    public:
-        Iterator(): pList(nullptr), current(nullptr), index(0);
-        Iterator(SLinkedList<T> *pList, bool begin);
-        Iterator &operator=(const Iterator &iterator);
-        void set(const T &e);
-        T &operator*();
-        bool operator!=(const Iterator &iterator);
-        
-        // Prefix ++ overload
-        Iterator &operator++();
-        
-        // Postfix ++ overload
-        Iterator operator++(int);
+    class Iterator{
+        private:
+            SLinkedList<T> *pList;
+            Node *current;
+            int index; // corresponding with current node
+        public:
+            Iterator(): pList(nullptr), current(nullptr), index(0){};
+            Iterator(SLinkedList<T> *pList, bool begin);
+            Iterator &operator=(const Iterator &iterator);
+            void set(const T &e);
+            T &operator*();
+            bool operator!=(const Iterator &iterator);
+            
+            // Prefix ++ overload
+            Iterator &operator++();
+            
+            // Postfix ++ overload
+            Iterator operator++(int);
 
-        void remove();
+            void remove();
     };
 };
+/********************************************/
+/***IMPLEMENT METHOD OF SINGLY LINKED LIST***/
+/********************************************/
+
+template <class T>
+void SLinkedList<T>::add(const T& e) {
+    /* Insert an element into the end of the list. */
+    add(this->count, e);
+}
+
+template<class T>
+void SLinkedList<T>::add(int index, const T &e) {
+    /* Insert an element into the list at given index. */ 
+    Node *temp = new Node(e);
+    if(index == 0 || this->head == NULL){
+        if(head == NULL){
+            head = temp;
+        }else{
+            temp->next = head;
+            head = temp;
+        }
+    }else{
+        int k = 1;
+        Node *p = this->head;
+        while(p != NULL && k != index){
+            p = p->next;
+            k++;
+        }
+        if(k!= index){
+            this->tail->next = temp;
+            this->tail = temp;
+        }else{
+            temp->next = p->next;
+            p->next = temp;
+        }
+    }
+    count++;
+}
+
+template<class T>
+T SLinkedList<T>::removeAt(int index) {
+    /* Give the data of the element at given index in the list. */
+    T data;
+    if(index == 0 ||  head->next == NULL){
+        data = head->data;
+        head = head->next;
+    }else{
+        int k = 1;
+        Node *p = this->head;
+        while(p->next->next != NULL && k != index){
+            p = p->next;
+            k++;
+        }
+        if(p->next != NULL) {
+            data = p->data;
+        }
+        p->next = p->next->next;
+    }
+    count--;
+    return data;  
+}
+
+template<class T>
+bool SLinkedList<T>::removeItem(const T &removeItem){
+    if (indexOf(removeItem) != -1){
+        removeAt(indexOf(removeItem));
+    }else{
+        return false;
+    }
+    return true;
+}
+
+template<class T>
+bool SLinkedList<T>::empty() {
+    /* Check if the list is empty or not. */
+    return (count > 0)? true : false;    
+}
+
+template<class T>
+int SLinkedList<T>::size() {
+    /* Return the length (size) of list */ 
+    return this->count;
+}
+
+template<class T>
+void SLinkedList<T>::clear(){
+    delete [] head;
+    delete [] tail;
+    count = 0;
+}
+
+template<class T>
+T SLinkedList<T>::get(int index) {
+    /* Give the data of the element at given index in the list. */
+    int i = 0;
+    Node* ptr = this->head;
+    while(i != index && ptr != NULL){
+        ptr = ptr->next;
+        i++;
+    }
+    return ptr->data;    
+}
+
+template <class T>
+void SLinkedList<T>::set(int index, const T& e) {
+    /* Assign new value for element at given index in the list */
+    int i = 0;
+    Node* ptr = this->head;
+    while(i != index && ptr != NULL){
+        ptr = ptr->next;
+        i++;
+    }
+    ptr->data = e;
+}
+
+template<class T>
+int SLinkedList<T>::indexOf(const T& item) {
+    /* Return the first index wheter item appears in list, otherwise return -1 */
+    int i = 0;
+    Node* ptr = this->head;
+    while(item != ptr->data && ptr != NULL){
+        ptr = ptr->next;
+        i++;
+    }
+    return i;
+}
+
+template<class T>
+bool SLinkedList<T>::contains(const T& item) {
+    /* Check if item appears in the list */
+    bool flag = false;
+    Node* ptr = this->head;
+    while(ptr != NULL){
+        if(item == ptr->data){
+            flag = true;
+            break;
+        }
+        ptr = ptr->next;
+    }
+    return flag;
+}
+
+/********************************************/
+/********IMPLEMENT METHOD OF ITERATOR********/
+/********************************************/
+
 template <class T>
 SLinkedList<T>::Iterator::Iterator(SLinkedList<T>* pList, bool begin)
 {
-    /*
-        Constructor of iterator
-        * Set pList to pList
-        * begin = true: 
-        * * Set current (index = 0) to pList's head if pList is not NULL
-        * * Otherwise set to NULL (index = -1)
-        * begin = false: 
-        * * Always set current to NULL
-        * * Set index to pList's size if pList is not NULL, otherwise 0
-    */
     this->pList = pList;
     if (begin) {
         if(pList) {
@@ -190,12 +250,7 @@ SLinkedList<T>::Iterator::Iterator(SLinkedList<T>* pList, bool begin)
 }
 
 template <class T>
-typename SLinkedList<T>::Iterator& SLinkedList<T>::Iterator::operator=(const Iterator& iterator)
-{
-    /*
-        Assignment operator
-        * Set this current, index, pList to iterator corresponding elements.
-    */
+typename SLinkedList<T>::Iterator& SLinkedList<T>::Iterator::operator=(const Iterator& iterator){
     this->pList = iterator.pList;
     this->current = iterator.current;
     this->index = iterator.index;
@@ -203,14 +258,7 @@ typename SLinkedList<T>::Iterator& SLinkedList<T>::Iterator::operator=(const Ite
 }
 
 template <class T>
-void SLinkedList<T>::Iterator::remove()
-{
-    /*
-        Remove a node which is pointed by current
-        * After remove current points to the previous node of this position (or node with index - 1)
-        * If remove at front, current points to previous "node" of head (current = NULL, index = -1)
-        * Exception: throw std::out_of_range("Segmentation fault!") if remove when current is NULL
-    */
+void SLinkedList<T>::Iterator::remove(){
     if (current == nullptr) {
         throw std::out_of_range("Segmentation fault!");
     }
@@ -238,69 +286,45 @@ void SLinkedList<T>::Iterator::remove()
 }
 
 template <class T>
-void SLinkedList<T>::Iterator::set(const T& e)
-{
-    /*
-        Set the new value for current node
-        * Exception: throw std::out_of_range("Segmentation fault!") if current is NULL
-    */
+void SLinkedList<T>::Iterator::set(const T& e){
     if (current) {
         current->data = e;
     }
 }
 
 template <class T>
-T& SLinkedList<T>::Iterator::operator*()
-{
-    /*
-        Get data stored in current node
-        * Exception: throw std::out_of_range("Segmentation fault!") if current is NULL
-    */
+T& SLinkedList<T>::Iterator::operator*(){
     if (current != NULL) {
             return current->data;
-    }else
+    }
+    else{
         throw std::out_of_range("Segmentation fault!");
+    }
 }
 
 template <class T>
-bool SLinkedList<T>::Iterator::operator!=(const Iterator& iterator)
-{
-    /*
-        Operator not equals
-        * Returns false if two iterators points the same node and index
-    */
+bool SLinkedList<T>::Iterator::operator!=(const Iterator& iterator){
     return this->current != iterator.current;
 }
-// Prefix ++ overload
+
 template <class T>
-typename SLinkedList<T>::Iterator& SLinkedList<T>::Iterator::operator++()
-{
-    /*
-        Prefix ++ overload
-        * Set current to the next node
-        * If iterator corresponds to the previous "node" of head, set it to head
-        * Exception: throw std::out_of_range("Segmentation fault!") if iterator corresponds to the end
-    */
+typename SLinkedList<T>::Iterator& SLinkedList<T>::Iterator::operator++(){
     if (current) {
         current = current->next;
         index++;
     }
     return *this;
 }
-// Postfix ++ overload
+
 template <class T>
 typename SLinkedList<T>::Iterator SLinkedList<T>::Iterator::operator++(int)
 {
-    /*
-        Postfix ++ overload
-        * Set current to the next node
-        * If iterator corresponds to the previous "node" of head, set it to head
-        * Exception: throw std::out_of_range("Segmentation fault!") if iterator corresponds to the end
-    */
     Iterator temp = *this;
     ++(*this);
     return temp;
 }
+
+
 class Polynomial;
 class Term {
 private:
@@ -374,24 +398,21 @@ public:
             cout << (*it);
         }
         cout << endl << "]";
-        // SLinkedList<Term>* Tcp = this->terms;
-        // cout <<"[";
-        // for(int i = 0; i < this->terms->size() - 1; i++){
-        //     cout << "{" << this->terms->get(i).coeff << ", " << this->terms->get(i).exp << "}, ";
-        // }
-        // cout << "{" << this->terms->get(this->terms->size()-1).coeff << ", " << this->terms->get(this->terms->size()-1).exp << "}]";
     }
 };
 int main(){
-    Polynomial *poly = new Polynomial();
-    poly->insertTerm(0.0, 0);
-    // Term term(4.0, 5);
-    // poly->insertTerm(term);
-    // poly->insertTerm(4.0, 3);
-    // poly->insertTerm(6.0, 1);
-    // poly->insertTerm(-16.0, 4);
-    // poly->insertTerm(-6.0, 6);
-    // poly->insertTerm(6.0, 4);
-poly->print();
+    SLinkedList<int> list;
+
+    int size = 10;
+    for(int idx=0; idx < size; idx++){
+        list.add(idx);
+    }
+
+    SLinkedList<int>::Iterator it;
+    int expvalue = 0;
+    for(it = list.begin(); it != list.end(); it++){
+        assert(*it == expvalue);
+        expvalue += 1;
+    }
     return 0;
 }
