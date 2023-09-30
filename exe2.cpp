@@ -98,30 +98,23 @@ void SLinkedList<T>::add(const T& e) {
 template<class T>
 void SLinkedList<T>::add(int index, const T &e) {
     /* Insert an element into the list at given index. */ 
-    Node *temp = new Node(e);
-    if(index == 0 || this->head == NULL){
-        if(head == NULL){
-            head = temp;
-        }else{
-            temp->next = head;
-            head = temp;
-        }
-    }else{
-        int k = 1;
-        Node *p = this->head;
-        while(p != NULL && k != index){
-            p = p->next;
-            k++;
-        }
-        if(k!= index){
-            this->tail->next = temp;
-            this->tail = temp;
-        }else{
-            temp->next = p->next;
-            p->next = temp;
-        }
+    if(index < 0 || index > this->count){
+        return;
     }
-    count++;
+    if(index == 0){
+        Node *temp = new Node(e, this->head);
+        this->head = temp;
+        this->tail = (!this->count) ? temp : tail;
+    }else{
+        Node *p = this->head;
+        for(int i = 0; i < index - 1; i++){
+            p = p->next;
+        }
+        Node *temp = new Node(e, p->next);
+        p->next = temp;
+        tail = (index == this->count) ? temp : tail;
+    }
+    this->count++;
 }
 
 template<class T>

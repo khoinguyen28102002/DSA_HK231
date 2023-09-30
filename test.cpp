@@ -1,218 +1,126 @@
 #include<iostream>
+#include<vector>
+#include<algorithm>
 
 using namespace std;
 
-template <class T>
-class SLinkedList
-{
-public:
-    class Iterator; //forward declaration
-    class Node;     //forward declaration
-protected:
-    Node *head;
-    Node *tail;
-    int count;
-public:
-    SLinkedList() : head(NULL), tail(NULL), count(0){};
-    ~SLinkedList() {
-        delete [] head;
-        delete [] tail;
-        count = 0;
+int **splitArr(int *num, int n, int k){
+    int SubN = (n%k)? n/k+1 : n/k;
+    int **Sub = new int*[SubN];
+    for(int i = 0; i < SubN; i+=k){
+        Sub[i] = new int[k];
+        for(int j = 0; j < k; j++){
+            Sub[i][j] = (i == SubN - 1 && n%k)? num[i] : 0;
+        }
     }
-    // void add(const T &e);
-    void add(int index, const T &e){
-        Node *temp = new Node(e);
-        if(index == 0 || this->head == NULL){
-            if(head == NULL){
-                head = temp;
+    return Sub;
+}
+int findSum(int *num, int n, int k){
+   for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (num[j] > num[j + 1]) {
+                // Swap num[j] and num[j+1]
+                int temp = num[j];
+                num[j] = num[j + 1];
+                num[j + 1] = temp;
+            }
+        }
+    }
+    
+}
+int helpfunction(int *num, int n, int k, int & size){
+    int max = num[0], i = 1, idx = 0, idx_max2 = 0, max2 = 0;
+    for(; i < n; i++){
+        if(num[i] > max){
+            max = num[i];
+            idx = i;
+        }else if(max2 < num[i]){
+            max2 =  num[i];
+            idx_max2 = i;
+        }
+    }
+    int start = idx , end = idx;
+    for(size = 0; size < k; ){
+        if(start < 0)   start = 0;
+        if(end >= n)    end = n - 1;
+        if(start == end){
+            num[start--] = -1;
+            end++;
+            size++;
+        }
+        else if(num[start] != -1 && num[end] != -1){
+            if(start == idx_max2){
+                num[end++] = -1;
+                size++;
+            }else if(end == idx_max2){
+                num[start--] = -1;
+                size++;
             }else{
-                temp->next = head;
-                head = temp;
+                num[start--] = -1;
+                num[end++] = -1;
+                size +=2;
             }
+        }else if(num[start] == -1 && num[end] != -1){
+            if(end == idx_max2 && end != n-1){
+                break;
+            }
+            num[end++] = -1;
+            size ++;
+        }else if(num[start] != -1 && num[end] == -1){
+            if(start == idx_max2 && start != 0){
+                break;
+            }
+            num[start--] = -1;
+            size++;
         }else{
-            int k = 1;
-            Node *p = this->head;
-            while(p != NULL && k != index){
-                p = p->next;
-                k++;
-            }
-            if(k!= index){
-                this->tail->next = temp;
-                this->tail = temp;
-            }else{
-                temp->next = p->next;
-                p->next = temp;
-            }
-        }
-        count++;
-    }
-    T removeAt(int index){
-        T data;
-        if(index == 0 ||  head->next == NULL){
-            data = head->data;
-            head = head->next;
-        }else{
-            int k = 1;
-            Node *p = this->head;
-            while(p->next->next != NULL && k != index){
-                p = p->next;
-                k++;
-            }
-            if(p->next != NULL) {
-                data = p->data;
-            }
-            p->next = p->next->next;
-        }
-        count--;
-        return data;
-    };
-    // bool removeItem(const T &removeItem);
-    // bool empty();
-    int size(){
-        return this->count;
-    };
-    void clear(){
-        delete [] head;
-        delete [] tail;
-        count = 0;
-    }
-    T get(int index){
-        int k = 0;
-        Node *p = this->head;
-        while(p != NULL && k != index){
-            p = p->next;
-            k++;
-        }
-        if(p){
-            return p->data;
-        }
-        return -1;
-    }
-    void set(int index, const T &e){
-        int k = 0;
-        Node *p = this->head;
-        while(p != NULL && k != index){
-            p = p->next;
-        }
-        if(p){
-            p->data = e;
+            break;
         }
     }
-    // int indexOf(const T &item);
-    // bool contains(const T &item);
-    // string toString();
-    SLinkedList(const SLinkedList &list)
-    {
-        this->count = 0;
-        this->head = NULL;
-        this->tail = NULL;
+    return (max > 0) ? max : 0;
+}
+int maxSum(int *nums, int n, int k){
+    int SubN = (n%k)? n/k+ n%k : n/k;
+    int *numcp = nums;
+    int sum = 0;
+    int j = 0;
+    while(j < SubN){
+        int size = 0;
+        int maxValue = helpfunction(numcp, n , k, size);
+        sum += maxValue*size;
+        j++;
     }
-    // Iterator begin()
-    // {
-    //     return Iterator(this, true);
-    // }
-    // Iterator end()
-    // {
-    //     return Iterator(this, false);
-    // }
-public:
-    class Node
-    {
-    private:
-        T data;
-        Node *next;
-        friend class SLinkedList<T>;
-    public:
-        Node()
-        {
-            next = 0;
+    return sum;
+}
+
+int sumLessThanTarget(vector<int> nums, int target){
+    int maxSum = 0;
+    int left = 0;
+    int right = nums.size() - 1;
+    while (left < right) {
+        int currentSum = nums[left] + nums[right];
+        if (currentSum < target && currentSum > maxSum) {
+            maxSum = currentSum;
         }
-        Node(Node *next)
-        {
-            this->next = next;
+        if (currentSum < target) {
+            left++;
+        } else {
+            right--;
         }
-        Node(T data, Node *next = NULL)
-        {
-            this->data = data;
-            this->next = next;
-        }
-    };
-    // class Iterator
-    // {
-    // private:
-    //     SLinkedList<T> *pList;
-    //     Node *current;
-    //     int index; // corresponding with current node
-    // public:
-    //     Iterator(): pList(nullptr), current(nullptr), index(0){};
-    //     // Iterator(const Iterator& i): pList(i.pList->c), current(i.current->clone()), index(i.index){};
-    //     Iterator(SLinkedList<T> *pList, bool begin);
-    //     // Iterator &operator=(const Iterator &iterator);
-    //     // void set(const T &e);
-    //     T &operator*(){
-    //         if(pList) return *(*pList);
-    //     };
-    //     bool operator!=(const Iterator &iterator);
-    //     // // Prefix ++ overload
-    //     // Iterator &operator++();
-    //     // // Postfix ++ overload
-    //     // Iterator operator++(int);
-    // };
-};
-class Polynomial;
-class Term {
-private:
-    double coeff;   
-    int exp;
-    friend class Polynomial;
-public:
-    Term(double coeff = 0.0, int exp = 0) {
-        this->coeff = coeff;
-        this->exp = exp;
     }
-    bool operator==(const Term& rhs) const {
-        return this->coeff == rhs.coeff && this->exp == rhs.exp;
-    }
-    friend ostream & operator<<(ostream &os, const Term& term) {
-        cout << endl;
-        cout << "Term: " << "(" << term.coeff << " " << term.exp << ")";
-        return os;
-    }
-};
-class Polynomial {
-private:
-    SLinkedList<Term>* terms;
-public:
-    Polynomial() {
-        this->terms = new SLinkedList<Term>();
-    }
-    ~Polynomial() {
-        this->terms->clear();
-    }
-    void insertTerm(const Term& term){
-        // TODO
-    }
-    void insertTerm(double coeff, int exp){
-        // TODO
-    }
-    void print() {
-        SLinkedList<Term>* Tcp = this->terms;
-        cout <<"[";
-        for(int i = 0; i < this->terms->size() - 1; i++){
-            cout << "{" << this->terms->get(i).coeff << ", " << this->terms->get(i).exp << "}, ";
-        }
-        cout << "{" << this->terms->get(this->terms->size()-1).coeff << ", " << this->terms->get(this->terms->size()-1).exp << "}]";
-    }
-};
+    return maxSum;
+}
 int main(){
-    Polynomial *poly = new Polynomial();
-    poly->insertTerm(6.0, 2);
-    // poly->insertTerm(4.0, 5);
-    // poly->insertTerm(4.0, 3);
-    // poly->insertTerm(6.0, 5);
-    // poly->insertTerm(-1.0, 0);
-    // poly->insertTerm(-6.0, 6);
-    // poly->insertTerm(6.0, 6);
-    poly->print();
+    // vector<int> arr{-10, -1, 1,2,3,5,6,9};
+    // cout << sumLessThanTarget(arr, 7);
+    // int nums[] = {15,5,7,2,2,6,1};
+    // cout << maxSum(nums, 7, 3)<<endl;
+    int nums[] = {1,6,3,2,2,5,1};
+    cout << maxSum(nums, 7, 3)<<endl;
+    // nums[] = {1,6,3,2,3,2,5,1};
+    // cout << maxSum(nums, 8, 3)<<endl;
+    // nums[] = {15,1,2,7,2,5,6};
+    // cout << maxSum(nums, 7, 3)<<endl;
+    // int nums[] = {1,6,2,7,2,5,15};
+    // cout << maxSum(nums, 7, 3)<<endl;
     return 0;
 }
