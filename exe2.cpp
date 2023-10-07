@@ -418,10 +418,12 @@ int main(){
         list.add(i);
     }
 
-    for (int i = 10; i < 20; ++i) {
-        assert(list.indexOf(i)) ;
-    }
+    assert(list.get(0) == list.removeAt(0));
 
-    cout << list.removeAt(9);
+    // cout << list.toString();
+for (int i = 0; i < 10; ++i) {
+        cout << list.get(i);
+    }
+    // cout << list.removeAt(9);
     return 0;
 }
