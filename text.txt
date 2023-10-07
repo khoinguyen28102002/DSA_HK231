@@ -1,21 +1,16 @@
-void LinkedList::partition(int k) {
-    Node* ptr = this -> head;
-    LinkedList res;
-    for(int count = 0; count < 3; ptr = ptr->next) {
-        if (ptr->value < k && count == 0){
-            res.add(ptr->value);
-        }        
-        if (ptr->value == k && count == 1){
-            res.add(ptr->value);
-        }
-        if (ptr->value > k && count == 2){
-            res.add(ptr->value);
-        }
-        if(ptr->next == NULL && count < 3){
-            ptr = this->head;
-            count++;
-        }
-    }
-    this->head =  res.head;
-    this->tail = res.tail;
-}
+-opencv: chuyển từ ảnh màu ->gray
+kitti vision
+https://www.cvlibs.net/datasets/kitti/eval_road.php
+
+export TURTLEBOT3_MODEL=waffle_pi mới có camera
+
+rqt_image_view: tạo ra 1 cửa sổ hình ảnh về làn đường? hình ảnh thu được từ robot?
+
+https://wiki.ros.org/ROS/Tutorials (step 11) 
+
+
+from cv_bridge import CvBridge
+
+-dùng thư viện 
+- dùng ros_tutorial: viết pub sub đơn giản, msg là hình ảnh (30 hình/ 1 giây)
+

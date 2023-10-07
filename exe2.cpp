@@ -120,34 +120,48 @@ void SLinkedList<T>::add(int index, const T &e) {
 template<class T>
 T SLinkedList<T>::removeAt(int index) {
     /* Give the data of the element at given index in the list. */
-    T data;
-    if(index == 0 ||  head->next == NULL){
-        data = head->data;
+    if (index < 0 || index >= count) {
+        return T();
+    }
+
+    T removedValue;
+    if (index == 0) {
+        // Removing the first node
+        Node* removedNode = head;
         head = head->next;
-    }else{
-        int k = 1;
-        Node *p = this->head;
-        while(p->next->next != NULL && k != index){
-            p = p->next;
-            k++;
+        removedValue = removedNode->data;
+        delete removedNode;
+        if (count == 1) {
+            tail = nullptr;
         }
-        if(p->next != NULL) {
-            data = p->data;
+    } else {
+        // Removing a node at a specific index
+        Node* current = head;
+        for (int i = 0; i < index - 1; i++) {
+            current = current->next;
         }
-        p->next = p->next->next;
+        Node* removedNode = current->next;
+        current->next = removedNode->next;
+        removedValue = removedNode->data;
+        delete removedNode;
+        if (index == count - 1) {
+            tail = current;
+        }
     }
     count--;
-    return data;  
+    return removedValue; 
 }
 
 template<class T>
-bool SLinkedList<T>::removeItem(const T &removeItem){
-    if (indexOf(removeItem) != -1){
-        removeAt(indexOf(removeItem));
+bool SLinkedList<T>::removeItem(const T &item){
+    int index = indexOf(item);
+    if (index != -1){
+        removeAt(index);
     }else{
         return false;
     }
     return true;
+    
 }
 
 template<class T>
@@ -164,14 +178,21 @@ int SLinkedList<T>::size() {
 
 template<class T>
 void SLinkedList<T>::clear(){
-    delete [] head;
-    delete [] tail;
-    count = 0;
+    while (this->head != nullptr) {
+        Node* temp = this->head;
+        this->head = this->head->next;
+        delete temp;
+    }
+    this->tail = nullptr;
+    this->count = 0;
 }
 
 template<class T>
 T SLinkedList<T>::get(int index) {
     /* Give the data of the element at given index in the list. */
+    if (index < 0 || index >= count) {
+        return T(); 
+    }
     int i = 0;
     Node* ptr = this->head;
     while(i != index && ptr != NULL){
@@ -184,6 +205,9 @@ T SLinkedList<T>::get(int index) {
 template <class T>
 void SLinkedList<T>::set(int index, const T& e) {
     /* Assign new value for element at given index in the list */
+    if (index < 0 || index >= count) {
+        return; 
+    }
     int i = 0;
     Node* ptr = this->head;
     while(i != index && ptr != NULL){
@@ -198,26 +222,19 @@ int SLinkedList<T>::indexOf(const T& item) {
     /* Return the first index wheter item appears in list, otherwise return -1 */
     int i = 0;
     Node* ptr = this->head;
-    while(item != ptr->data && ptr != NULL){
+    while(ptr != NULL){
+        if(item == ptr->data)
+            return i;
         ptr = ptr->next;
         i++;
     }
-    return i;
+    return -1;
 }
 
 template<class T>
 bool SLinkedList<T>::contains(const T& item) {
     /* Check if item appears in the list */
-    bool flag = false;
-    Node* ptr = this->head;
-    while(ptr != NULL){
-        if(item == ptr->data){
-            flag = true;
-            break;
-        }
-        ptr = ptr->next;
-    }
-    return flag;
+    return (indexOf(item) != -1)? true : false;
 }
 
 /********************************************/
@@ -394,18 +411,17 @@ public:
     }
 };
 int main(){
+            
     SLinkedList<int> list;
 
-    int size = 10;
-    for(int idx=0; idx < size; idx++){
-        list.add(idx);
+    for (int i = 0; i < 10; ++i) {
+        list.add(i);
     }
 
-    SLinkedList<int>::Iterator it;
-    int expvalue = 0;
-    for(it = list.begin(); it != list.end(); it++){
-        assert(*it == expvalue);
-        expvalue += 1;
-    }
+    // for (int i = 10; i < 20; ++i) {
+    //     cout << list.indexOf(i) ;
+    // }
+
+    cout << list.removeAt(9);
     return 0;
 }
