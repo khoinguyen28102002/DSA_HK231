@@ -167,7 +167,7 @@ bool SLinkedList<T>::removeItem(const T &item){
 template<class T>
 bool SLinkedList<T>::empty() {
     /* Check if the list is empty or not. */
-    return (count > 0)? true : false;    
+    return (count > 0)? false : true;    
 }
 
 template<class T>
@@ -418,9 +418,9 @@ int main(){
         list.add(i);
     }
 
-    // for (int i = 10; i < 20; ++i) {
-    //     cout << list.indexOf(i) ;
-    // }
+    for (int i = 10; i < 20; ++i) {
+        assert(list.indexOf(i)) ;
+    }
 
     cout << list.removeAt(9);
     return 0;
